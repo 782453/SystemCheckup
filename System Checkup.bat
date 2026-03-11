@@ -863,7 +863,11 @@ goto :admin_menu
 :do_cleanup
 echo.
 set /p edit="Edit sageset before cleanup? (y/n): "
-if /i "%edit%"=="y" cleanmgr /sageset:99
+if /i "%edit%"=="y" (
+    cleanmgr /sageset:99
+    echo Sageset saved. Press any key to start cleanup...
+    pause >nul
+)
 echo.
 echo Starting cleanup...
 taskkill /f /im explorer.exe >nul 2>&1
