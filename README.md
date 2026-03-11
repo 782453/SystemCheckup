@@ -91,22 +91,6 @@ A password-protected Windows diagnostic and maintenance toolkit built entirely i
 
 ## Disclaimer
 
-This tool performs low-level system operations including file deletion, registry modification, service configuration, startup entry removal, and forced system restarts. **Use at your own risk.**
-
-By using SystemCheckup, you acknowledge and agree that:
-
-- You are solely responsible for any outcomes resulting from the use of this script
-- The author provides no guarantees regarding data integrity, system stability, or fitness for any particular purpose
-- Some tools will **permanently delete files**, modify the Windows registry, or restart your system without further warning
-- It is strongly recommended to **create a manual backup or system restore point** before running any tool
-- The author shall not be held liable for any data loss, system damage, or other issues arising from the use of this software
-
-This script is provided as-is, without warranty of any kind.
-
----
-
-## Disclaimer
-
 This tool performs low-level system operations including file deletion, registry modification, service configuration, and system restarts. **Use it at your own risk.**
 
 By using SystemCheckup, you acknowledge and agree that:
