@@ -361,8 +361,6 @@ goto :%menu_num%
 :0
 call :Log "TOOL 00 - Quick cleanup started"
 %std%
-taskkill /f /im explorer.exe >nul 2>&1
-timeout /t 2 /nobreak >nul
 call :do_cleanup
 start explorer.exe
 echo Quick cleanup completed. Press any key to return to menu.
@@ -429,7 +427,7 @@ exit /b
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :7
 call :Log "TOOL 07 - Full fix started"
-%std% & taskkill /f /im explorer.exe & timeout 1 /nobreak>nul
+%std%
 set CPU=0
 call :get_drive
 set /p edit="Edit Registry file? (y/n): "
@@ -868,6 +866,8 @@ set /p edit="Edit sageset before cleanup? (y/n): "
 if /i "%edit%"=="y" cleanmgr /sageset:99
 echo.
 echo Starting cleanup...
+taskkill /f /im explorer.exe >nul 2>&1
+timeout /t 2 /nobreak >nul
 echo.
 echo [01/17] Clearing user temp folders...
 if exist "%TEMP%" (del /f /s /q "%TEMP%\*.*" >nul 2>&1 & rmdir /s /q "%TEMP%" >nul 2>&1 & md "%TEMP%" >nul 2>&1)

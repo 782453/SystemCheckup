@@ -1,18 +1,40 @@
 # SystemCheckup
 
-A password-protected Windows diagnostic and maintenance toolkit built entirely in Batch/PowerShell. Developed and refined over 5 years, SystemCheckup provides a unified interface for the most common system repair and cleanup tasks — no third-party software required.
+A password-protected Windows diagnostic and maintenance toolkit built entirely in Batch/PowerShell. Developed and refined over 5 years, SystemCheckup provides a unified interface for the most common system repair and cleanup tasks - no third-party software required.
+
+---
+
+## Screenshots
+
+**Permissions check & welcome**
+![Permissions](screenshots/permissions.png)
+
+**Startup summary - live system stats after login**
+![Startup Summary](screenshots/info.png)
+
+**Main menu**
+![Main Menu](screenshots/main_menu.png)
+
+**Registration - password and security question setup**
+![Register](screenshots/register.png)
+
+**Tool 00 - Quick Cleanup in progress**
+![Quick Cleanup](screenshots/tool_0.png)
+
+**Tool 19 - Toggle Unnecessary Services**
+![Toggle Services](screenshots/tool_19.png)
 
 ---
 
 ## Features
 
-- **Secure login system** — Salted SHA-256 password hashing, security question recovery, and persistent lockout after failed attempts
-- **Startup summary** — Displays live system stats (CPU load, RAM, drive space, last login) immediately after login
+- **Secure login system** - Salted SHA-256 password hashing, security question recovery, and persistent lockout after failed attempts
+- **Startup summary** - Displays live system stats (CPU load, RAM, drive space, last login) immediately after login
 - **22 diagnostic tools** covering cleanup, repair, diagnostics, network, and performance
-- **Admin menu** — Manage restore points, view and clear the activity log, and change your password
-- **Activity log** — Timestamped log file written to the Desktop after every tool run
-- **Dual-drive support** — CHKDSK and full repair tools support both single and dual drive configurations
-- **Auto-elevate** — Automatically relaunches as Administrator if permissions are insufficient
+- **Admin menu** - Manage restore points, view and clear the activity log, and change your password
+- **Activity log** - Timestamped log file written to the Desktop after every tool run
+- **Dual-drive support** - CHKDSK and full repair tools support both single and dual drive configurations
+- **Auto-elevate** - Automatically relaunches as Administrator if permissions are insufficient
 
 ---
 
@@ -22,7 +44,7 @@ A password-protected Windows diagnostic and maintenance toolkit built entirely i
 |---|------|-------------|
 | 00 | Quick Cleanup | Deep temp file cleanup across system, user, and app directories |
 | 01 | System File Checker | Runs `sfc /scannow` to repair corrupted system files |
-| 02 | Network Reset | Full network stack reset — Winsock, IP, firewall, DNS |
+| 02 | Network Reset | Full network stack reset - Winsock, IP, firewall, DNS |
 | 03 | Drive Integrity Check | Runs `chkdsk` with full scan on one or two drives |
 | 04 | Disk Cleanup | Clears temp folder and runs Windows Disk Cleanup |
 | 05 | DISM Repair | Restores Windows image health via DISM |
@@ -57,21 +79,29 @@ A password-protected Windows diagnostic and maintenance toolkit built entirely i
 ## Setup & Usage
 
 1. Download `SystemCheckup.bat`
-2. Right-click → **Run as administrator** (or let the script re-launch itself automatically)
+2. Right-click - **Run as administrator** (or let the script re-launch itself automatically)
 3. On first run, you will be prompted to register a password and a security question
 4. After login, a startup summary is displayed before the main menu
 5. Enter the tool number and press Enter to run it
 
-**Login commands** (type at the password prompt):
+**Login prompt commands:**
 
 | Command | Action |
 |---------|--------|
 | `help` | Show available commands |
 | `reset_pass` | Reset password via security question |
-| `admin` | Open the admin menu (after login) |
 | `exit` | Exit the program |
 
-**Data file:** Credentials are stored in `%APPDATA%\Microsoft\Windows\NlsData0414.bin` using salted SHA-256 hashes — the password itself is never stored in plain text.
+**Main menu commands:**
+
+| Command | Action |
+|---------|--------|
+| `admin` | Open the admin menu (manage restore points, view log, change password) |
+| `help` | Show available commands |
+| `back` | Return to the login screen |
+| `exit` | Exit the program |
+
+**Data file:** Credentials are stored in `%APPDATA%\Microsoft\Windows\NlsData0414.bin` using salted SHA-256 hashes - the password itself is never stored in plain text.
 
 **Log file:** An activity log is maintained at `%USERPROFILE%\Desktop\SystemCheckup_Log.txt`
 
@@ -97,8 +127,8 @@ By using SystemCheckup, you acknowledge and agree that:
 
 - You are solely responsible for any outcomes resulting from running this script on your system
 - The author provides no guarantees of fitness for any particular purpose or environment
-- No liability is accepted for data loss, system instability, or any other damage — direct or indirect — caused by the use or misuse of this tool
-- It is strongly recommended to **create a system restore point** before running any repair or cleanup tool (tool 07 and tool 11 do this automatically)
+- No liability is accepted for data loss, system instability, or any other damage - direct or indirect - caused by the use or misuse of this tool
+- It is strongly recommended to **create a system restore point** before running any repair or cleanup tool (tools 07 and 11 do this automatically)
 
 This script is provided as-is, for personal and educational use.
 
