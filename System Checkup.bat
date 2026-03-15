@@ -1,7 +1,7 @@
 @echo off
 SETLOCAL ENABLEDELAYEDEXPANSION
 color 0F
-set ver=6.0
+set ver=6.1
 set "std=cls & mode con: cols=120 lines=30 & color 0F"
 title System Checkup v%ver%
 :check_Permissions
@@ -326,9 +326,9 @@ Call :Color C " 16. " & Call :Color B "Check Internet Speed				" & Call :Color A
 echo.
 Call :Color C "     Test download & upload speeds			" & Call :Color A "|| " & Call :Color C "    Clears unused memory for speed"
 echo.
-Call :Color C " 17. " & Call :Color B "Check Windows Version				" & Call :Color A "|| " &:: Call :Color C "22. " & Call :Color B "NULL"
+Call :Color C " 17. " & Call :Color B "Check Windows Version				" & Call :Color A "|| " & Call :Color C "22. " & Call :Color B "Broken Shortcut Cleaner"
 echo.
-Call :Color C "     Show Windows version & build number		" & Call :Color A "|| " &:: Call :Color C "    NULL"
+Call :Color C "     Show Windows version & build number		" & Call :Color A "|| " & Call :Color C "    Scans and removes broken .lnk shortcuts"
 echo.
 Call :Color C " 18. " & Call :Color B "Reset Windows Updates				" & Call :Color A "|| " &:: Call :Color C "23. " & Call :Color B "NULL"
 echo.
@@ -353,7 +353,7 @@ echo %menu_num%|findstr /r "[^0-9]">nul
 if not errorlevel 1 goto :main
 
 if %menu_num% LSS 0 goto :main
-if %menu_num% GTR 21 goto :main
+if %menu_num% GTR 22 goto :main
 goto :%menu_num%
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -361,6 +361,19 @@ goto :%menu_num%
 :0
 call :Log "TOOL 00 - Quick cleanup started"
 %std%
+echo ============================================================
+echo                    Quick Cleanup
+echo ============================================================
+echo.
+echo  This tool will:
+echo    - Delete temp files across 25 locations
+echo    - Kill and restart Windows Explorer
+echo    - Run Disk Cleanup (cleanmgr)
+echo.
+echo  Continue? (y/n)
+echo ============================================================
+set /p confirm="> "
+if /i not "%confirm%"=="y" goto :main
 call :do_cleanup
 start explorer.exe
 echo Quick cleanup completed. Press any key to return to menu.
@@ -369,12 +382,42 @@ pause >nul
 goto :main
 :1
 call :Log "TOOL 01 - SFC scan started"
-%std% & sfc /scannow
+%std%
+echo ============================================================
+echo                 System File Checker
+echo ============================================================
+echo.
+echo  This tool will:
+echo    - Scan all protected Windows system files
+echo    - Repair corrupted or missing files automatically
+echo    - May take 10-30 minutes to complete
+echo.
+echo  Continue? (y/n)
+echo ============================================================
+set /p confirm="> "
+if /i not "%confirm%"=="y" goto :main
+sfc /scannow
 call :Log "TOOL 01 - SFC scan completed"
 pause>nul & goto :main
 :2
 call :Log "TOOL 02 - Network reset started"
 %std%
+echo ============================================================
+echo                   Network Reset
+echo ============================================================
+echo.
+echo  This tool will:
+echo    - Reset IP stack and Winsock
+echo    - Reset Windows Firewall settings
+echo    - Release and renew IP address
+echo    - Flush DNS cache
+echo.
+echo  NOTE: Your internet connection will drop briefly.
+echo.
+echo  Continue? (y/n)
+echo ============================================================
+set /p confirm="> "
+if /i not "%confirm%"=="y" goto :main
 echo Resetting network settings...
 netsh int ip reset
 netsh winsock reset
@@ -388,6 +431,21 @@ pause >nul
 goto :main
 :3
 %std%
+echo ============================================================
+echo                Drive Integrity Check
+echo ============================================================
+echo.
+echo  This tool will:
+echo    - Run CHKDSK with full scan on selected drive(s)
+echo    - Fix file system errors
+echo    - Restart the system when finished
+echo.
+echo  NOTE: This will RESTART your PC.
+echo.
+echo  Continue? (y/n)
+echo ============================================================
+set /p confirm="> "
+if /i not "%confirm%"=="y" goto :main
 call :get_drive
 call :Log "TOOL 03 - CHKDSK started on drive %drive%"
 call :do_chkdsk
@@ -397,6 +455,18 @@ pause>nul & shutdown -r -t 2 & exit
 :4
 call :Log "TOOL 04 - Temp cleanup started"
 cls & mode con: cols=85 lines=30 & color 0F
+echo ============================================================
+echo                    Disk Cleanup
+echo ============================================================
+echo.
+echo  This tool will:
+echo    - Delete all files in the Temp folder
+echo    - Run Windows Disk Cleanup (cleanmgr)
+echo.
+echo  Continue? (y/n)
+echo ============================================================
+set /p confirm="> "
+if /i not "%confirm%"=="y" goto :main
 echo Clearing temp folder and running Disk Cleanup...
 if exist "%Temp%" (del /f /s /q "%Temp%\*.*" >nul 2>&1 & rmdir /s /q "%Temp%" >nul 2>&1 & md "%Temp%" >nul 2>&1)
 cleanmgr /sagerun:99
@@ -406,19 +476,42 @@ goto :main
 :5
 call :Log "TOOL 05 - DISM repair started"
 %std%
-echo DISM will scan and repair the Windows image. A restart is required after.
-echo Proceed? (y/n)
+echo ============================================================
+echo                    DISM Repair
+echo ============================================================
+echo.
+echo  This tool will:
+echo    - Scan and repair the Windows system image
+echo    - May take 15-30 minutes to complete
+echo    - Restart the system when finished
+echo.
+echo  NOTE: This will RESTART your PC.
+echo.
+echo  Continue? (y/n)
+echo ============================================================
 set /p confirm="> "
-if not "%confirm%"=="y" goto :main
+if /i not "%confirm%"=="y" goto :main
 dism /online /cleanup-image /restorehealth
 call :Log "TOOL 05 - DISM completed, system restarting"
 pause>nul
 shutdown -r -t 5
 exit
 :6
-%std% & echo Continuing will restart your PC into BIOS. & echo Proceed? (y/n)
+%std%
+echo ============================================================
+echo                  Restart to BIOS
+echo ============================================================
+echo.
+echo  This tool will:
+echo    - Immediately restart your PC into BIOS/UEFI
+echo    - Save all work before continuing
+echo.
+echo  NOTE: This will RESTART your PC immediately.
+echo.
+echo  Continue? (y/n)
+echo ============================================================
 set /p confirm="> "
-if not %confirm%==y goto :main
+if /i not "%confirm%"=="y" goto :main
 echo.
 shutdown /r /fw /f /t 0
 exit /b
@@ -428,21 +521,34 @@ exit /b
 :7
 call :Log "TOOL 07 - Full fix started"
 %std%
-set CPU=0
+echo ============================================================
+echo              Full Corruption Fix & Cleanup
+echo ============================================================
+echo.
+echo  This tool will run the following in order:
+echo.
+echo    1. Optional - Apply Explorer CPU registry fix
+echo    2. Update all apps via winget
+echo    3. Optional - Delete old restore points
+echo    4. Create a new restore point
+echo    5. Scan and remove broken shortcuts
+echo    6. Full 25-step junk cleanup
+echo    7. Flush DNS
+echo    8. SFC system file scan and repair
+echo    9. DISM image repair
+echo   10. CHKDSK on selected drive(s)
+echo   11. Restart the system
+echo.
+echo  WARNING: This process is long and will RESTART your PC.
+echo  Estimated time: 30-90 minutes depending on drive size.
+echo.
+echo  Continue? (y/n)
+echo ============================================================
+set /p confirm="> "
+if /i not "%confirm%"=="y" goto :main
 call :get_drive
 set /p edit="Edit Registry file? (y/n): "
-if /i "%edit%"=="y" (
-	set CPU=1
-	goto :9.1
-)
-:CPU_check
-if %CPU%==1 (
-	set CPU=0
-	echo Editing Registry file. Press any key to continue...
-	timeout /t 2 /nobreak >nul
-	del %temp%\CPU_fix.reg >nul 2>&1
-	echo.
-)
+if /i "%edit%"=="y" call :do_cpu_fix
 echo Updating installed programs...
 Winget upgrade --all
 echo Update completed
@@ -455,6 +561,7 @@ if /i "%edit%"=="y" (
 	echo.
 )
 call :do_restore_point
+call :do_shortcut_clean
 call :do_cleanup
 call :Log "TOOL 07 - Full fix completed, system restarting"
 call :do_full_repair
@@ -494,24 +601,67 @@ pause
 goto :main
 :9
 %std%
-set CPU=0
-:9.1
-echo Windows Registry Editor Version 5.00>%temp%\CPU_fix.reg
-echo. >>%temp%\CPU_fix.reg
-echo [HKEY_CURRENT_USER\Software\Microsoft\input]>>%temp%\CPU_fix.reg
-echo "IsInputAppPreloadEnabled"=dword:00000000>>%temp%\CPU_fix.reg
-echo. >>%temp%\CPU_fix.reg
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Dsh]>>%temp%\CPU_fix.reg
-echo "IsPrelaunchEnabled"=dword:00000000>>%temp%\CPU_fix.reg
-start %temp%\CPU_fix.reg
-if %CPU%==1 goto :CPU_check
-pause
-del %temp%\CPU_fix.reg
+call :Log "TOOL 09 - Explorer CPU fix started"
+echo ============================================================
+echo            Fix Windows Explorer High CPU
+echo ============================================================
+echo.
+echo  This tool will:
+echo    - Write and apply a registry fix (.reg file)
+echo    - Disable input app preloading
+echo    - Disable Windows Dashboard preloading
+echo.
+echo  NOTE: You will be prompted to confirm the registry change.
+echo.
+echo  Continue? (y/n)
+echo ============================================================
+set /p confirm="> "
+if /i not "%confirm%"=="y" goto :main
+call :do_cpu_fix
+call :Log "TOOL 09 - Explorer CPU fix completed"
 goto :main
 :10
-%std% & Winget upgrade --all & pause & goto :main
+%std%
+call :Log "TOOL 10 - Winget upgrade started"
+echo ============================================================
+echo                   Winget Upgrade
+echo ============================================================
+echo.
+echo  This tool will:
+echo    - Check all installed apps for updates
+echo    - Automatically install available updates
+echo    - May take several minutes depending on pending updates
+echo.
+echo  Continue? (y/n)
+echo ============================================================
+set /p confirm="> "
+if /i not "%confirm%"=="y" goto :main
+Winget upgrade --all
+call :Log "TOOL 10 - Winget upgrade completed"
+pause & goto :main
 :11
 call :Log "TOOL 11 - Full diagnostic started"
+%std%
+echo ============================================================
+echo               Full System Diagnostic
+echo ============================================================
+echo.
+echo  This tool will run the following in order:
+echo.
+echo    1. Delete old restore points
+echo    2. Create a new restore point
+echo    3. Flush DNS
+echo    4. SFC system file scan and repair
+echo    5. DISM image repair
+echo    6. CHKDSK on selected drive(s)
+echo    7. Restart the system
+echo.
+echo  WARNING: This will RESTART your PC when complete.
+echo.
+echo  Continue? (y/n)
+echo ============================================================
+set /p confirm="> "
+if /i not "%confirm%"=="y" goto :main
 %std% & taskkill /f /im explorer.exe & timeout 1 /nobreak>nul
 call :get_drive
 echo Deleting old Restore Points...
@@ -536,7 +686,7 @@ goto :12
 echo Select 'Restart now and check for problems' in the opened Windows 
 MdSched
 pause>nul
-goto :Eof
+goto :main
 :14
 call :Log "TOOL 14 - Clean boot initiated by %username%"
 %std%
@@ -623,6 +773,21 @@ goto :main
 :18
 call :Log "TOOL 18 - Windows Update reset started"
 %std%
+echo ============================================================
+echo              Reset Windows Updates
+echo ============================================================
+echo.
+echo  This tool will:
+echo    - Stop Windows Update services
+echo    - Rename SoftwareDistribution and catroot2 folders
+echo    - Restart Windows Update services
+echo.
+echo  NOTE: Windows will re-download update data on next check.
+echo.
+echo  Continue? (y/n)
+echo ============================================================
+set /p confirm="> "
+if /i not "%confirm%"=="y" goto :main
 echo Resetting Windows Update...
 net stop wuauserv >nul 2>&1
 net stop bits >nul 2>&1
@@ -716,6 +881,18 @@ goto :main
 :20
 call :Log "TOOL 20 - Registry repair started"
 %std%
+echo ============================================================
+echo                  Registry Repair
+echo ============================================================
+echo.
+echo  This tool will:
+echo    - Back up Uninstall and Run registry keys to Temp
+echo    - Clear pending file rename operations in the registry
+echo.
+echo  Continue? (y/n)
+echo ============================================================
+set /p confirm="> "
+if /i not "%confirm%"=="y" goto :main
 echo Repairing registry errors...
 reg export HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall "%temp%\RegistryBackup.reg"
 reg export HKCU\Software\Microsoft\Windows\CurrentVersion\Run "%temp%\RegistryRunBackup.reg"
@@ -726,6 +903,20 @@ pause >nul
 goto :main
 :21
 %std%
+call :Log "TOOL 21 - RAM optimizer started"
+echo ============================================================
+echo                  RAM Optimizer
+echo ============================================================
+echo.
+echo  This tool will:
+echo    - Trim working set of high memory processes
+echo    - Flush DNS cache
+echo    - Normalize Explorer process priority
+echo.
+echo  Continue? (y/n)
+echo ============================================================
+set /p confirm="> "
+if /i not "%confirm%"=="y" goto :main
 echo Optimizing RAM usage...
 echo.
 
@@ -740,7 +931,22 @@ powershell.exe -Command "Get-Process explorer | ForEach-Object { $_.PriorityClas
 
 echo Done. Some memory has been returned to the available pool.
 echo Note: For deeper RAM cleanup, consider restarting background apps.
+call :Log "TOOL 21 - RAM optimizer completed"
 pause
+goto :main
+:22
+%std%
+call :Log "TOOL 22 - Broken Shortcut Cleaner started"
+echo ============================================================
+echo            Broken Shortcut Cleaner
+echo ============================================================
+echo.
+echo Scanning for broken shortcuts...
+echo.
+call :do_shortcut_clean
+call :Log "TOOL 22 - Broken Shortcut Cleaner completed - removed %count% broken shortcut(s)"
+echo Done. Press any key to return to menu.
+pause >nul
 goto :main
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -858,8 +1064,7 @@ call :Log "ADMIN - Log file cleared by %username%"
 echo Log cleared.
 timeout /t 2 /nobreak >nul
 goto :admin_menu
-
-:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :do_cleanup
 echo.
 set /p edit="Edit sageset before cleanup? (y/n): "
@@ -945,21 +1150,21 @@ if exist "%APPDATA%\Zoom\logs" (del /f /s /q "%APPDATA%\Zoom\logs\*.*" >nul 2>&1
 echo.
 cleanmgr /sagerun:99
 goto :eof
-:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :do_restore_point
 echo Creating a new Restore Point...
 for /f "tokens=* USEBACKQ" %%F IN (`time /t`) DO set "time=%%F"
 powershell.exe -Command "Checkpoint-Computer -Description 'System_Checkup_%time%' -RestorePointType 'MODIFY_SETTINGS'" >nul 2>&1
 echo Restore Point Created.
 goto :eof
-:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :do_chkdsk
 if "%drive%"=="2" (
     echo y|chkdsk "%drive1%:" /F /R /perf /scan
     echo y|chkdsk "%drive2%:" /F /R /perf /scan
 ) else echo y|chkdsk "%drive%:" /F /R /perf /scan
 goto :eof
-:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :do_full_repair
 ipconfig /flushdns & sfc /scannow & dism /online /cleanup-image /restorehealth
 call :do_chkdsk
@@ -968,6 +1173,77 @@ start explorer.exe
 echo Process finished, press any key to restart your system.
 pause>nul & shutdown -r -t 1
 exit
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:do_shortcut_clean
+set "tmpfile=%TEMP%\broken_shortcuts.txt"
+if exist "%tmpfile%" del /f /q "%tmpfile%"
+
+powershell -NoProfile -Command ^
+    "$shell = New-Object -COM WScript.Shell;" ^
+    "$locations = @(" ^
+    "  '$env:USERPROFILE\Desktop'," ^
+    "  '$env:PUBLIC\Desktop'," ^
+    "  '$env:APPDATA\Microsoft\Windows\Start Menu\Programs'," ^
+    "  '$env:PROGRAMDATA\Microsoft\Windows\Start Menu\Programs'," ^
+    "  '$env:APPDATA\Microsoft\Internet Explorer\Quick Launch'" ^
+    ");" ^
+    "foreach ($loc in $locations) {" ^
+    "  if (Test-Path $loc) {" ^
+    "    Get-ChildItem -Path $loc -Filter '*.lnk' -Recurse -ErrorAction SilentlyContinue | ForEach-Object {" ^
+    "      try {" ^
+    "        $target = $shell.CreateShortcut($_.FullName).TargetPath;" ^
+    "        if ($target -and !(Test-Path $target)) {" ^
+    "          $_.FullName | Out-File -Append -Encoding UTF8 '%tmpfile%'" ^
+    "        }" ^
+    "      } catch {}" ^
+    "    }" ^
+    "  }" ^
+    "}"
+
+if not exist "%tmpfile%" (
+    echo No broken shortcuts found.
+    set count=0
+    goto :eof
+)
+
+set count=0
+for /f "usebackq delims=" %%F in ("%tmpfile%") do (
+    echo   [BROKEN] %%F
+    set /a count+=1
+)
+
+echo.
+echo Found %count% broken shortcut(s).
+echo.
+set /p confirm="Delete all broken shortcuts? (y/n): "
+if /i not "%confirm%"=="y" (
+    del /f /q "%tmpfile%"
+    goto :eof
+)
+
+echo.
+for /f "usebackq delims=" %%F in ("%tmpfile%") do (
+    del /f /q "%%F" >nul 2>&1
+    echo   [DELETED] %%F
+)
+
+del /f /q "%tmpfile%"
+echo.
+goto :eof
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:do_cpu_fix
+echo Windows Registry Editor Version 5.00>%temp%\CPU_fix.reg
+echo. >>%temp%\CPU_fix.reg
+echo [HKEY_CURRENT_USER\Software\Microsoft\input]>>%temp%\CPU_fix.reg
+echo "IsInputAppPreloadEnabled"=dword:00000000>>%temp%\CPU_fix.reg
+echo. >>%temp%\CPU_fix.reg
+echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Dsh]>>%temp%\CPU_fix.reg
+echo "IsPrelaunchEnabled"=dword:00000000>>%temp%\CPU_fix.reg
+start %temp%\CPU_fix.reg
+echo Registry file opened. Accept the prompt, then press any key to continue...
+pause >nul
+del %temp%\CPU_fix.reg >nul 2>&1
+goto :eof
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :Color
 SetLocal EnableExtensions EnableDelayedExpansion

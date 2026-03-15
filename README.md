@@ -30,7 +30,7 @@ A password-protected Windows diagnostic and maintenance toolkit built entirely i
 
 - **Secure login system** - Salted SHA-256 password hashing, security question recovery, and persistent lockout after failed attempts
 - **Startup summary** - Displays live system stats (CPU load, RAM, drive space, last login) immediately after login
-- **22 diagnostic tools** covering cleanup, repair, diagnostics, network, and performance
+- **23 diagnostic tools** covering cleanup, repair, diagnostics, network, and performance
 - **Admin menu** - Manage restore points, view and clear the activity log, and change your password
 - **Activity log** - Timestamped log file written to the Desktop after every tool run
 - **Dual-drive support** - CHKDSK and full repair tools support both single and dual drive configurations
@@ -42,14 +42,14 @@ A password-protected Windows diagnostic and maintenance toolkit built entirely i
 
 | # | Tool | Description |
 |---|------|-------------|
-| 00 | Quick Cleanup | Deep temp file cleanup across system, user, and app directories |
+| 00 | Quick Cleanup | 25-step deep temp file cleanup across system, user, and app directories |
 | 01 | System File Checker | Runs `sfc /scannow` to repair corrupted system files |
 | 02 | Network Reset | Full network stack reset - Winsock, IP, firewall, DNS |
 | 03 | Drive Integrity Check | Runs `chkdsk` with full scan on one or two drives |
 | 04 | Disk Cleanup | Clears temp folder and runs Windows Disk Cleanup |
 | 05 | DISM Repair | Restores Windows image health via DISM |
 | 06 | Restart to BIOS | Reboots directly into BIOS/UEFI firmware settings |
-| 07 | Full Fix & Cleanup | Runs registry fix, winget upgrade, restore point, cleanup, SFC, DISM, CHKDSK, and restart |
+| 07 | Full Fix & Cleanup | Runs registry fix, winget upgrade, restore point, shortcut clean, 25-step cleanup, SFC, DISM, CHKDSK, and restart |
 | 08 | Battery & Energy Report | Generates and opens battery and energy reports |
 | 09 | Explorer CPU Fix | Applies registry fix for Windows Explorer high CPU usage |
 | 10 | Winget Upgrade | Updates all installed applications via winget |
@@ -64,6 +64,7 @@ A password-protected Windows diagnostic and maintenance toolkit built entirely i
 | 19 | Toggle Services | Toggles SysMain and related services on/off |
 | 20 | Registry Repair | Backs up and clears pending registry rename operations |
 | 21 | RAM Optimizer | Raises Explorer process priority to free unused memory |
+| 22 | Broken Shortcut Cleaner | Scans Desktop, Start Menu, and Quick Launch for broken .lnk shortcuts and removes them |
 
 ---
 
@@ -111,6 +112,7 @@ A password-protected Windows diagnostic and maintenance toolkit built entirely i
 
 | Version | Highlights |
 |---------|------------|
+| v6.1 | Added Tool 22 (Broken Shortcut Cleaner) scanning Desktop, Start Menu, and Quick Launch. Cleanup expanded from 17 to 25 steps (added Chrome, Edge, Discord, Steam, icon cache, VS Code, Spotify, Zoom). Confirmation and warning screens added to all tools. Fixed sageset dialog order. Fixed Tool 13 exit bug. Refactored CPU fix into `:do_cpu_fix` subroutine |
 | v6.0 | Complete code overhaul. Subroutine architecture, startup summary screen, admin menu, salted SHA-256 hashing, persistent lockout, timestamped log file, removed all `wmic` calls in favour of PowerShell, standardized console across all tools |
 | v5.0 | SHA-256 password hashing, security question recovery, failed attempts lockout, network reset expanded, 9 new tools added (System Info, Speed Test, Windows Version, Reset Windows Update, Registry Repair, RAM Optimizer, Service disabler) |
 | v3.4.7 | Auto-restart as Administrator, replaced `ping` delays with `timeout`, added `restore_p_del` command, fixed WiFi SSID error handling, added Memory Diagnostic (13) and Clean Boot (14) |
@@ -138,7 +140,7 @@ This script is provided as-is, for personal and educational use.
 
 MIT License
 
-Copyright (c) 2026
+Copyright (c) 2026 Lior Lazary
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
